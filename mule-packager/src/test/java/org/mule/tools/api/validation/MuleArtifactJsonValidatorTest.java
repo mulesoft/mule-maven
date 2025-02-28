@@ -9,6 +9,7 @@ package org.mule.tools.api.validation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.tools.api.packager.structure.PackagerFiles.MULE_ARTIFACT_JSON;
@@ -55,6 +56,16 @@ public class MuleArtifactJsonValidatorTest {
     missingFields = new ArrayList<>();
     deploymentConfigurationMock = mock(Deployment.class);
     when(deploymentConfigurationMock.getMuleVersion()).thenReturn(Optional.of("4.0.0"));
+  }
+
+  @Test
+  void validateTest(@TempDir Path projectBaseDir) throws IOException, ValidationException {
+    Path muleArtifactJsonPath = projectBaseDir.resolve("mule-artifact.json");
+    String validMuleArtifactJson = "{ \"name\": \"test-project\", \"minMuleVersion\": \"4.0.0\", \"requiredProduct\": \"MULE\" }";
+
+    FileUtils.writeStringToFile(muleArtifactJsonPath.toFile(), validMuleArtifactJson);
+    assertThatCode(() -> MuleArtifactJsonValidator.validate(projectBaseDir, Optional.empty()))
+        .doesNotThrowAnyException();
   }
 
   @Test
@@ -134,6 +145,18 @@ public class MuleArtifactJsonValidatorTest {
         new MuleApplicationModelJsonSerializer().deserialize("{ minMuleVersion:4.0.0 }");
 
     checkMinMuleVersionValue(muleArtifact, missingFields, Optional.empty());
+
+    assertThat(missingFields.isEmpty()).describedAs("Missing fields should be empty").isTrue();
+  }
+
+  @Test
+  public void checkMinMuleVersionCompatibleVersionTest() throws ValidationException {
+    Optional<String> deployMuleVersion = Optional.of("4.4.0");
+
+    MuleApplicationModel muleArtifact =
+        new MuleApplicationModelJsonSerializer().deserialize("{ minMuleVersion:4.0.0 }");
+
+    checkMinMuleVersionValue(muleArtifact, missingFields, deployMuleVersion);
 
     assertThat(missingFields.isEmpty()).describedAs("Missing fields should be empty").isTrue();
   }
