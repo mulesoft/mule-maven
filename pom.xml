@@ -57,7 +57,7 @@
         <snakeyaml.version>2.0</snakeyaml.version>
         <semver4j.version>3.1.0</semver4j.version>
         <semantic.version.version>1.2.0</semantic.version.version>
-        <log4j.version>2.22.1</log4j.version>
+        <log4j.version>2.24.3</log4j.version>
         <commons.io.version>2.16.1</commons.io.version>
         <commons.exec.version>1.2</commons.exec.version>
         <commons.lang.version>3.14.0</commons.lang.version>
